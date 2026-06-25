@@ -8,344 +8,787 @@
 <meta name="apple-mobile-web-app-title" content="メッセージ">
 <meta name="theme-color" content="#ffffff">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
 <title>メッセージ</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
 
-  :root {
-    --safe-top: env(safe-area-inset-top);
-    --safe-bottom: env(safe-area-inset-bottom);
-  }
+:root {
+  --safe-top: env(safe-area-inset-top);
+  --safe-bottom: env(safe-area-inset-bottom);
+}
 
-  body {
-    font-family: -apple-system, 'Helvetica Neue', sans-serif;
-    background: #f2f2f7;
-    height: 100dvh;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-  }
+body {
+  font-family: -apple-system, 'Helvetica Neue', sans-serif;
+  background: #f2f2f7;
+  height: 100dvh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
 
-  /* Nav bar — sits just below OS status bar */
-  .nav-bar {
-    background: rgba(242,242,247,0.92);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    padding-top: max(var(--safe-top), 8px);
-    padding-bottom: 10px;
-    padding-left: 16px;
-    padding-right: 16px;
-    display: flex;
-    align-items: center;
-    border-bottom: 0.5px solid rgba(0,0,0,0.15);
-    flex-shrink: 0;
-  }
+/* ===== SCREENS ===== */
+.screen { display:none; flex-direction:column; height:100dvh; }
+.screen.active { display:flex; }
 
-  .nav-back {
-    color: #007aff;
-    font-size: 17px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    cursor: pointer;
-    flex: 1;
-    user-select: none;
-  }
-  .nav-back svg { width: 10px; height: 16px; fill: none; stroke: #007aff; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+/* ===== NAV ===== */
+.nav-bar {
+  background: rgba(242,242,247,0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding-top: max(var(--safe-top), 8px);
+  padding-bottom: 10px;
+  padding-left: 16px;
+  padding-right: 16px;
+  display: flex;
+  align-items: center;
+  border-bottom: 0.5px solid rgba(0,0,0,0.15);
+  flex-shrink: 0;
+  gap: 8px;
+}
+.nav-back {
+  color: #007aff;
+  font-size: 17px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  flex: 1;
+  user-select: none;
+  white-space: nowrap;
+}
+.nav-back svg { width:10px; height:16px; fill:none; stroke:#007aff; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; flex-shrink:0; }
+.nav-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 2;
+}
+.nav-avatar {
+  width:36px; height:36px;
+  background:#8e8e93;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:2px;
+  flex-shrink:0;
+}
+.nav-avatar svg { width:22px; height:22px; fill:#fff; }
+.nav-name { font-size:12px; font-weight:600; color:#000; text-align:center; }
+.nav-right { flex:1; display:flex; justify-content:flex-end; }
+.nav-dots { font-size:22px; color:#007aff; cursor:pointer; }
 
-  .nav-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 2;
-  }
-  .nav-avatar {
-    width: 36px; height: 36px;
-    background: #8e8e93;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 2px;
-  }
-  .nav-avatar svg { width: 22px; height: 22px; fill: #fff; }
-  .nav-name { font-size: 12px; font-weight: 600; color: #000; }
+/* ===== CHAT ===== */
+.chat-area {
+  flex:1;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding: 12px 16px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  background:#f2f2f7;
+}
+.chat-area::-webkit-scrollbar { display:none; }
 
-  .nav-right {
-    flex: 1;
-    display: flex;
-    justify-content: flex-end;
-  }
-  .nav-dots { font-size: 22px; color: #007aff; cursor: pointer; letter-spacing: 1px; }
+.date-divider {
+  text-align:center;
+  font-size:12px;
+  color:#8e8e93;
+  margin:10px 0 6px;
+}
 
-  /* Chat scroll area */
-  .chat-area {
-    flex: 1;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 12px 16px 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    background: #f2f2f7;
-  }
-  .chat-area::-webkit-scrollbar { display: none; }
+/* Bubbles */
+.bubble-row {
+  display:flex;
+  align-items:flex-end;
+  gap:6px;
+  animation: bubbleIn 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes bubbleIn {
+  from { opacity:0; transform:scale(0.7) translateY(10px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
+.bubble-row.received { justify-content:flex-start; }
+.bubble-row.sent     { justify-content:flex-end; }
 
-  .date-divider {
-    text-align: center;
-    font-size: 12px;
-    color: #8e8e93;
-    margin: 10px 0 6px;
-  }
+.bubble {
+  max-width:78%;
+  padding:10px 14px;
+  border-radius:18px;
+  font-size:15px;
+  line-height:1.46;
+  word-break:break-word;
+  cursor:pointer;
+  transition: transform 0.1s ease;
+  user-select:none;
+}
+.bubble:active { transform: scale(0.95); }
+.bubble.received { background:#fff; color:#000; border-bottom-left-radius:4px; }
+.bubble.sent     { background:#007aff; color:#fff; border-bottom-right-radius:4px; }
 
-  /* Bubbles */
-  .bubble-row {
-    display: flex;
-    align-items: flex-end;
-    gap: 6px;
-  }
-  .bubble-row.received { justify-content: flex-start; }
-  .bubble-row.sent     { justify-content: flex-end; }
+.btime { font-size:11px; color:#8e8e93; white-space:nowrap; padding-bottom:2px; }
+.bubble-row.sent .btime { order:-1; }
 
-  .bubble {
-    max-width: 78%;
-    padding: 10px 14px;
-    border-radius: 18px;
-    font-size: 15px;
-    line-height: 1.46;
-    word-break: break-word;
-  }
-  .bubble.received {
-    background: #fff;
-    color: #000;
-    border-bottom-left-radius: 4px;
-  }
-  .bubble.sent {
-    background: #007aff;
-    color: #fff;
-    border-bottom-right-radius: 4px;
-  }
+.old-msg { opacity:0.35; filter:blur(1.5px); pointer-events:none; }
 
-  .btime {
-    font-size: 11px;
-    color: #8e8e93;
-    white-space: nowrap;
-    padding-bottom: 2px;
-  }
-  .bubble-row.sent .btime { order: -1; }
+/* Message block with more link */
+.msg-block { max-width:78%; display:flex; flex-direction:column; }
+.msg-block .bubble { border-radius:18px 18px 18px 4px; max-width:100%; }
+.more-btn {
+  background:#fff;
+  border-top:0.5px solid #e5e5ea;
+  padding:11px 14px;
+  font-size:15px;
+  color:#000;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-radius:0 0 14px 4px;
+  cursor:pointer;
+  user-select:none;
+}
+.more-btn span { color:#c7c7cc; }
 
-  /* Faded old message */
-  .old-msg {
-    opacity: 0.35;
-    filter: blur(1.5px);
-    pointer-events: none;
-  }
+/* MMS */
+.mms-wrap { margin-top:4px; border-radius:14px; overflow:hidden; width:232px; background:#111; }
+.mms-visual {
+  height:130px;
+  background:linear-gradient(135deg,#1a0533 0%,#2d0a6b 45%,#0f0a40 100%);
+  position:relative; overflow:hidden; display:flex; align-items:flex-end;
+}
+.mms-visual::before {
+  content:''; position:absolute; inset:0;
+  background: radial-gradient(ellipse at 28% 65%,rgba(180,50,255,0.4) 0%,transparent 55%),
+              radial-gradient(ellipse at 72% 35%,rgba(70,110,255,0.35) 0%,transparent 50%);
+}
+.mms-visual::after {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:55px;
+  background:rgba(100,20,180,0.5);
+  clip-path:polygon(0% 100%,12% 55%,28% 72%,50% 22%,72% 60%,88% 42%,100% 65%,100% 100%);
+}
+.mms-content { position:relative; z-index:2; padding:10px 12px; width:100%; display:flex; gap:8px; align-items:flex-start; }
+.mms-l { display:flex; flex-direction:column; gap:1px; }
+.mms-year { color:rgba(255,255,255,0.75); font-size:9px; font-weight:500; letter-spacing:0.5px; }
+.mms-title { color:#fff; font-weight:900; font-size:20px; line-height:1.05; }
+.mms-gf { color:rgba(255,180,80,0.9); font-size:7.5px; letter-spacing:1.5px; margin-top:3px; }
+.mms-r { margin-left:auto; display:flex; flex-direction:column; align-items:flex-end; gap:5px; }
+.mms-event { color:rgba(255,220,120,0.85); font-size:8px; font-weight:600; text-align:right; line-height:1.3; }
+.mms-rtitle { color:#ffd700; font-size:12px; font-weight:800; text-align:right; }
+.mms-badge { background:rgba(180,130,255,0.85); color:#fff; font-size:8.5px; font-weight:700; padding:3px 7px; border-radius:4px; white-space:nowrap; }
+.mms-label { font-size:11px; color:#8e8e93; padding:2px 4px 0; }
 
-  /* Long message block with "more" link */
-  .msg-block {
-    max-width: 78%;
-    display: flex;
-    flex-direction: column;
-  }
-  .msg-block .bubble {
-    border-radius: 18px 18px 18px 4px;
-    max-width: 100%;
-  }
-  .more-btn {
-    background: #fff;
-    border-top: 0.5px solid #e5e5ea;
-    padding: 11px 14px;
-    font-size: 15px;
-    color: #000;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-radius: 0 0 14px 4px;
-    cursor: pointer;
-    user-select: none;
-  }
-  .more-btn span { color: #c7c7cc; }
+/* Input bar */
+.input-bar {
+  background:rgba(242,242,247,0.95);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-top:0.5px solid rgba(0,0,0,0.12);
+  padding:10px 12px;
+  padding-bottom:max(calc(var(--safe-bottom) + 6px),16px);
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex-shrink:0;
+}
+.plus-btn { color:#007aff; font-size:28px; line-height:1; cursor:pointer; font-weight:300; user-select:none; }
+.input-field {
+  flex:1;
+  background:#fff;
+  border:0.5px solid #d1d1d6;
+  border-radius:20px;
+  padding:8px 14px;
+  font-size:15px;
+  outline:none;
+  color:#000;
+  font-family:inherit;
+  resize:none;
+  max-height:120px;
+  overflow-y:auto;
+}
+.input-field::placeholder { color:#8e8e93; }
+.send-btn {
+  width:33px; height:33px;
+  background:#007aff;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; flex-shrink:0;
+  user-select:none;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+.send-btn:active { transform:scale(0.85); }
+.send-btn svg { width:14px; height:14px; }
 
-  /* MMS card */
-  .mms-wrap {
-    margin-top: 4px;
-    border-radius: 14px;
-    overflow: hidden;
-    width: 232px;
-    background: #111;
-  }
-  .mms-visual {
-    height: 130px;
-    background: linear-gradient(135deg, #1a0533 0%, #2d0a6b 45%, #0f0a40 100%);
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    align-items: flex-end;
-  }
-  .mms-visual::before {
-    content: '';
-    position: absolute; inset: 0;
-    background:
-      radial-gradient(ellipse at 28% 65%, rgba(180,50,255,0.4) 0%, transparent 55%),
-      radial-gradient(ellipse at 72% 35%, rgba(70,110,255,0.35) 0%, transparent 50%);
-  }
-  .mms-visual::after {
-    content: '';
-    position: absolute;
-    bottom: 0; left: 0; right: 0; height: 55px;
-    background: rgba(100,20,180,0.5);
-    clip-path: polygon(0% 100%, 12% 55%, 28% 72%, 50% 22%, 72% 60%, 88% 42%, 100% 65%, 100% 100%);
-  }
-  .mms-content {
-    position: relative; z-index: 2;
-    padding: 10px 12px;
-    width: 100%;
-    display: flex;
-    gap: 8px;
-    align-items: flex-start;
-  }
-  .mms-l { display: flex; flex-direction: column; gap: 1px; }
-  .mms-year { color: rgba(255,255,255,0.75); font-size: 9px; font-weight: 500; letter-spacing: 0.5px; }
-  .mms-title { color: #fff; font-weight: 900; font-size: 20px; line-height: 1.05; }
-  .mms-gf { color: rgba(255,180,80,0.9); font-size: 7.5px; letter-spacing: 1.5px; margin-top: 3px; }
-  .mms-r { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
-  .mms-event { color: rgba(255,220,120,0.85); font-size: 8px; font-weight: 600; text-align: right; line-height: 1.3; }
-  .mms-rtitle { color: #ffd700; font-size: 12px; font-weight: 800; text-align: right; }
-  .mms-badge {
-    background: rgba(180,130,255,0.85);
-    color: #fff; font-size: 8.5px; font-weight: 700;
-    padding: 3px 7px; border-radius: 4px; white-space: nowrap;
-  }
-  .mms-label { font-size: 11px; color: #8e8e93; padding: 2px 4px 0; }
+/* ===== EDIT SCREEN ===== */
+.edit-screen {
+  background: #f2f2f7;
+}
+.edit-nav {
+  background:rgba(242,242,247,0.95);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  padding-top:max(var(--safe-top),8px);
+  padding-bottom:12px;
+  padding-left:16px;
+  padding-right:16px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:0.5px solid rgba(0,0,0,0.15);
+  flex-shrink:0;
+}
+.edit-nav-title { font-size:17px; font-weight:600; color:#000; }
+.edit-done {
+  color:#007aff;
+  font-size:17px;
+  font-weight:600;
+  cursor:pointer;
+  user-select:none;
+}
+.edit-cancel {
+  color:#007aff;
+  font-size:17px;
+  cursor:pointer;
+  user-select:none;
+}
 
-  /* Input bar */
-  .input-bar {
-    background: rgba(242,242,247,0.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 0.5px solid rgba(0,0,0,0.12);
-    padding: 10px 12px;
-    padding-bottom: max(calc(var(--safe-bottom) + 6px), 16px);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-  }
-  .plus-btn { color: #007aff; font-size: 28px; line-height: 1; cursor: pointer; font-weight: 300; user-select: none; }
-  .input-field {
-    flex: 1;
-    background: #fff;
-    border: 0.5px solid #d1d1d6;
-    border-radius: 20px;
-    padding: 8px 14px;
-    font-size: 15px;
-    outline: none;
-    color: #000;
-    font-family: inherit;
-  }
-  .input-field::placeholder { color: #8e8e93; }
-  .send-btn {
-    width: 33px; height: 33px;
-    background: #007aff;
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; flex-shrink: 0;
-    user-select: none;
-  }
-  .send-btn svg { width: 14px; height: 14px; }
+.edit-body {
+  flex:1;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:20px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+.edit-body::-webkit-scrollbar { display:none; }
+
+.edit-section {
+  background:#fff;
+  border-radius:12px;
+  overflow:hidden;
+}
+.edit-section-title {
+  font-size:13px;
+  color:#8e8e93;
+  font-weight:500;
+  padding:0 16px 8px;
+  text-transform:uppercase;
+  letter-spacing:0.3px;
+}
+
+.edit-row {
+  display:flex;
+  align-items:center;
+  padding:12px 16px;
+  border-bottom:0.5px solid #f2f2f7;
+  gap:12px;
+}
+.edit-row:last-child { border-bottom:none; }
+.edit-label {
+  font-size:15px;
+  color:#000;
+  width:80px;
+  flex-shrink:0;
+}
+.edit-input {
+  flex:1;
+  border:none;
+  outline:none;
+  font-size:15px;
+  color:#000;
+  font-family:inherit;
+  background:transparent;
+  text-align:right;
+}
+.edit-input::placeholder { color:#c7c7cc; }
+.edit-textarea {
+  flex:1;
+  border:none;
+  outline:none;
+  font-size:15px;
+  color:#000;
+  font-family:inherit;
+  background:transparent;
+  resize:none;
+  min-height:60px;
+  line-height:1.4;
+}
+.edit-textarea::placeholder { color:#c7c7cc; }
+
+/* Message list editor */
+.msg-list { display:flex; flex-direction:column; }
+.msg-item {
+  padding:12px 16px;
+  border-bottom:0.5px solid #f2f2f7;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.msg-item:last-child { border-bottom:none; }
+.msg-item-header {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+.msg-item-label { font-size:13px; color:#8e8e93; }
+.msg-delete-btn {
+  color:#ff3b30;
+  font-size:13px;
+  cursor:pointer;
+  user-select:none;
+}
+.msg-item-type {
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+.type-btn {
+  padding:4px 10px;
+  border-radius:8px;
+  font-size:12px;
+  cursor:pointer;
+  border:1px solid #d1d1d6;
+  background:#f2f2f7;
+  color:#8e8e93;
+  user-select:none;
+  transition:all 0.15s;
+}
+.type-btn.active {
+  background:#007aff;
+  color:#fff;
+  border-color:#007aff;
+}
+
+.add-msg-btn {
+  margin:0 16px 16px;
+  padding:12px;
+  background:#007aff;
+  color:#fff;
+  border-radius:10px;
+  text-align:center;
+  font-size:15px;
+  font-weight:500;
+  cursor:pointer;
+  user-select:none;
+  transition: opacity 0.15s;
+}
+.add-msg-btn:active { opacity:0.7; }
+
+/* Preview button */
+.preview-btn {
+  margin:0 16px;
+  padding:14px;
+  background:#34c759;
+  color:#fff;
+  border-radius:12px;
+  text-align:center;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  user-select:none;
+  transition: opacity 0.15s;
+}
+.preview-btn:active { opacity:0.7; }
+
+/* Password screen */
+.pw-screen {
+  background:#f2f2f7;
+  justify-content:center;
+  align-items:center;
+  gap:24px;
+}
+.pw-logo {
+  width:72px; height:72px;
+  background:#007aff;
+  border-radius:18px;
+  display:flex; align-items:center; justify-content:center;
+}
+.pw-logo svg { width:40px; height:40px; fill:#fff; }
+.pw-title { font-size:22px; font-weight:700; color:#000; }
+.pw-subtitle { font-size:15px; color:#8e8e93; }
+.pw-input-wrap {
+  width:100%;
+  max-width:280px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.pw-input {
+  background:#fff;
+  border:0.5px solid #d1d1d6;
+  border-radius:12px;
+  padding:14px 16px;
+  font-size:17px;
+  outline:none;
+  color:#000;
+  text-align:center;
+  font-family:inherit;
+  letter-spacing:4px;
+}
+.pw-btn {
+  background:#007aff;
+  color:#fff;
+  border-radius:12px;
+  padding:14px;
+  text-align:center;
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  user-select:none;
+}
+.pw-error { color:#ff3b30; font-size:14px; text-align:center; min-height:20px; }
 </style>
 </head>
 <body>
 
-<!-- Nav -->
-<div class="nav-bar">
-  <div class="nav-back">
-    <svg viewBox="0 0 10 16"><polyline points="9,1 1,8 9,15"/></svg>
-    戻る
+<!-- ===== PASSWORD SCREEN ===== -->
+<div class="screen pw-screen active" id="pwScreen">
+  <div class="pw-logo">
+    <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
   </div>
-  <div class="nav-center">
-    <div class="nav-avatar">
-      <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
-    </div>
-    <span class="nav-name">010-●●●●-●●●5</span>
-  </div>
-  <div class="nav-right">
-    <span class="nav-dots">···</span>
+  <div class="pw-title">管理者ログイン</div>
+  <div class="pw-subtitle">編集画面にアクセスするには<br>パスワードを入力してください</div>
+  <div class="pw-input-wrap">
+    <input class="pw-input" type="password" id="pwInput" placeholder="••••" maxlength="8">
+    <div class="pw-error" id="pwError"></div>
+    <div class="pw-btn" onclick="checkPassword()">ログイン</div>
   </div>
 </div>
 
-<!-- Chat -->
-<div class="chat-area" id="chat">
-
-  <!-- old blurred message -->
-  <div class="bubble-row received old-msg">
-    <div class="bubble received" style="font-size:13px;">U 1B ㅠ...</div>
-    <div class="btime">午後 12:44</div>
+<!-- ===== EDIT SCREEN ===== -->
+<div class="screen edit-screen" id="editScreen">
+  <div class="edit-nav">
+    <div class="edit-cancel" onclick="showSMS()">キャンセル</div>
+    <div class="edit-nav-title">編集</div>
+    <div class="edit-done" onclick="applyAndShowSMS()">完了</div>
   </div>
 
-  <div class="date-divider">12月18日 木曜日</div>
-
-  <!-- First SMS -->
-  <div class="bubble-row received">
-    <div class="bubble received">
-      오늘 일괄적으로 모바일티켓(입장권 교환용) 문자 발송예정입니다. 입장권은 현장에서 신분증 확인 후 드립니다 감사합니다
-    </div>
-    <div class="btime">午後 5:24</div>
-  </div>
-
-  <!-- Second SMS block -->
-  <div class="bubble-row received" style="margin-top:8px; align-items:flex-start;">
-    <div class="msg-block">
-      <div class="bubble received">
-        [Web발신]<br>
-        ⭐티켓 교환권은 입장권이 아닙니다. 입장권 교환 확인용 티켓입니다.<br><br>
-        [인천공항 면세점] '별 보러 가자' 참가 확정 안내 (KBS가요대축제 티켓 교환권)<br>
-        인천공항면세점앱 에어스타 듀티프리에서 준비한 특별 연말 선물! [2025 KBS가요대축제 글로벌 페스티벌 티켓 교환권]을 발송 드립니다. 공연 당일 [이벤트 티켓 교환 현장 부스]에서 해당 모바일 티켓 교환권을 제시하고 신분증 본인 확인 후 입장권을 교환해 드립니다. (*중요* 유효 신분증 지참)<br><br>
-        🔴 이벤트 입장권 교환 부스 안내 🔴<br>
-        ▷부스 위치: 송도컨벤시아
+  <div class="edit-body">
+    <!-- 送信者 -->
+    <div class="edit-section-title">送信者</div>
+    <div class="edit-section">
+      <div class="edit-row">
+        <div class="edit-label">電話番号</div>
+        <input class="edit-input" id="editPhone" type="text" placeholder="010-0000-0000" value="010-●●●●-●●●5">
       </div>
-      <div class="more-btn">모두 보기 <span>›</span></div>
-
-      <!-- MMS image card -->
-      <div class="mms-wrap">
-        <div class="mms-visual">
-          <div class="mms-content">
-            <div class="mms-l">
-              <span class="mms-year">2025 KBS</span>
-              <div class="mms-title">가요<br>대축제</div>
-              <span class="mms-gf">GLOBAL FESTIVAL</span>
-            </div>
-            <div class="mms-r">
-              <div class="mms-event">인천공항 면세점 이벤트 전용</div>
-              <div class="mms-rtitle">별보러가자</div>
-              <div class="mms-badge">VIP 티켓 입장 교환권</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="mms-label">MMS 午後 6:36</div>
     </div>
-  </div>
 
+    <!-- 日付 -->
+    <div class="edit-section-title">日付</div>
+    <div class="edit-section">
+      <div class="edit-row">
+        <div class="edit-label">日付</div>
+        <input class="edit-input" id="editDate" type="text" placeholder="12月18日 木曜日" value="12月18日 木曜日">
+      </div>
+    </div>
+
+    <!-- メッセージ一覧 -->
+    <div class="edit-section-title">メッセージ</div>
+    <div class="edit-section">
+      <div class="msg-list" id="msgList"></div>
+    </div>
+    <div class="add-msg-btn" onclick="addMessage()">＋ メッセージを追加</div>
+
+    <!-- プレビュー -->
+    <div class="preview-btn" onclick="applyAndShowSMS()">✓ 完了してSMS画面へ</div>
+    <div style="height:20px;"></div>
+  </div>
 </div>
 
-<!-- Input -->
-<div class="input-bar">
-  <div class="plus-btn">+</div>
-  <input class="input-field" placeholder="メッセージ" type="text">
-  <div class="send-btn">
-    <svg viewBox="0 0 14 14" fill="none"><path d="M7 12V2M2 7l5-5 5 5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+<!-- ===== SMS SCREEN ===== -->
+<div class="screen" id="smsScreen">
+  <div class="nav-bar">
+    <div class="nav-back">
+      <svg viewBox="0 0 10 16"><polyline points="9,1 1,8 9,15"/></svg>
+      戻る
+    </div>
+    <div class="nav-center">
+      <div class="nav-avatar">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+      </div>
+      <span class="nav-name" id="displayPhone">010-●●●●-●●●5</span>
+    </div>
+    <div class="nav-right">
+      <span class="nav-dots" onclick="goToEdit()">···</span>
+    </div>
+  </div>
+
+  <div class="chat-area" id="chatArea"></div>
+
+  <div class="input-bar">
+    <div class="plus-btn">+</div>
+    <textarea class="input-field" id="msgInput" placeholder="メッセージ" rows="1"></textarea>
+    <div class="send-btn" onclick="sendMessage()">
+      <svg viewBox="0 0 14 14" fill="none"><path d="M7 12V2M2 7l5-5 5 5" stroke="#fff" stroke-width="2" stroke-linecap:round; stroke-linejoin:round"/></svg>
+    </div>
   </div>
 </div>
 
 <script>
-  // Register service worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(console.error);
-  }
+// ===== STATE =====
+const PASSWORD = '1234';
 
-  // Scroll to bottom on load
-  const chat = document.getElementById('chat');
+let state = {
+  phone: '010-●●●●-●●●5',
+  date: '12月18日 木曜日',
+  messages: [
+    {
+      id: 1,
+      type: 'received',
+      text: 'U 1B ㅠ...',
+      time: '午後 12:44',
+      faded: true
+    },
+    {
+      id: 2,
+      type: 'received',
+      text: '오늘 일괄적으로 모바일티켓(입장권 교환용) 문자 발송예정입니다. 입장권은 현장에서 신분증 확인 후 드립니다 감사합니다',
+      time: '午後 5:24',
+      faded: false
+    },
+    {
+      id: 3,
+      type: 'received',
+      text: '[Web발신]\n⭐티켓 교환권은 입장권이 아닙니다. 입장권 교환 확인용 티켓입니다.\n\n[인천공항 면세점] \'별 보러 가자\' 참가 확정 안내 (KBS가요대축제 티켓 교환권)\n인천공항면세점앱 에어스타 듀티프리에서 준비한 특별 연말 선물! [2025 KBS가요대축제 글로벌 페스티벌 티켓 교환권]을 발송 드립니다. 공연 당일 [이벤트 티켓 교환 현장 부스]에서 해당 모바일 티켓 교환권을 제시하고 신분증 본인 확인 후 입장권을 교환해 드립니다. (*중요* 유효 신분증 지참)\n\n🔴 이벤트 입장권 교환 부스 안내 🔴\n▷부스 위치: 송도컨벤시아',
+      time: 'MMS 午後 6:36',
+      faded: false,
+      hasMMS: true,
+      hasMore: true
+    }
+  ],
+  nextId: 10
+};
+
+// ===== PASSWORD =====
+function checkPassword() {
+  const val = document.getElementById('pwInput').value;
+  if (val === PASSWORD) {
+    document.getElementById('pwError').textContent = '';
+    showEdit();
+  } else {
+    document.getElementById('pwError').textContent = 'パスワードが違います';
+    document.getElementById('pwInput').value = '';
+  }
+}
+document.getElementById('pwInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkPassword();
+});
+
+// ===== SCREEN TRANSITIONS =====
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function showEdit() {
+  renderEditScreen();
+  showScreen('editScreen');
+}
+
+function showSMS() {
+  renderSMSScreen();
+  showScreen('smsScreen');
+}
+
+function goToEdit() {
+  showScreen('pwScreen');
+  document.getElementById('pwInput').value = '';
+  document.getElementById('pwError').textContent = '';
+}
+
+function applyAndShowSMS() {
+  // Save from edit fields
+  state.phone = document.getElementById('editPhone').value || '010-●●●●-●●●5';
+  state.date = document.getElementById('editDate').value || '12月18日 木曜日';
+  // Messages saved on-the-fly
+  showSMS();
+}
+
+// ===== EDIT SCREEN =====
+function renderEditScreen() {
+  document.getElementById('editPhone').value = state.phone;
+  document.getElementById('editDate').value = state.date;
+  renderMsgList();
+}
+
+function renderMsgList() {
+  const list = document.getElementById('msgList');
+  list.innerHTML = '';
+  state.messages.forEach((msg, idx) => {
+    const div = document.createElement('div');
+    div.className = 'msg-item';
+    div.innerHTML = `
+      <div class="msg-item-header">
+        <span class="msg-item-label">メッセージ ${idx + 1}</span>
+        <span class="msg-delete-btn" onclick="deleteMsg(${msg.id})">削除</span>
+      </div>
+      <div class="msg-item-type">
+        <div class="type-btn ${msg.type==='received'?'active':''}" onclick="setMsgType(${msg.id},'received')">受信</div>
+        <div class="type-btn ${msg.type==='sent'?'active':''}" onclick="setMsgType(${msg.id},'sent')">送信</div>
+      </div>
+      <textarea class="edit-textarea" placeholder="メッセージ内容" oninput="setMsgText(${msg.id},this.value)">${msg.text}</textarea>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <span style="font-size:13px;color:#8e8e93;width:32px;">時刻</span>
+        <input style="flex:1;border:none;border-bottom:0.5px solid #e5e5ea;outline:none;font-size:14px;padding:4px 0;color:#000;background:transparent;font-family:inherit;" 
+          type="text" placeholder="午後 5:24" value="${msg.time}" oninput="setMsgTime(${msg.id},this.value)">
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function setMsgType(id, type) {
+  const msg = state.messages.find(m => m.id === id);
+  if (msg) { msg.type = type; renderMsgList(); }
+}
+function setMsgText(id, text) {
+  const msg = state.messages.find(m => m.id === id);
+  if (msg) msg.text = text;
+}
+function setMsgTime(id, time) {
+  const msg = state.messages.find(m => m.id === id);
+  if (msg) msg.time = time;
+}
+function deleteMsg(id) {
+  state.messages = state.messages.filter(m => m.id !== id);
+  renderMsgList();
+}
+function addMessage() {
+  state.messages.push({
+    id: state.nextId++,
+    type: 'received',
+    text: '',
+    time: '午後 0:00',
+    faded: false
+  });
+  renderMsgList();
+  // Scroll to bottom of edit
+  const body = document.querySelector('.edit-body');
+  setTimeout(() => body.scrollTop = body.scrollHeight, 50);
+}
+
+// ===== SMS SCREEN =====
+function renderSMSScreen() {
+  document.getElementById('displayPhone').textContent = state.phone;
+  const chat = document.getElementById('chatArea');
+  chat.innerHTML = '';
+
+  let lastDate = null;
+
+  state.messages.forEach(msg => {
+    // Date divider (once)
+    if (!lastDate && state.date) {
+      const div = document.createElement('div');
+      div.className = 'date-divider';
+      div.textContent = state.date;
+      chat.appendChild(div);
+      lastDate = state.date;
+    }
+
+    const row = document.createElement('div');
+    row.className = `bubble-row ${msg.type} ${msg.faded ? 'old-msg' : ''}`;
+
+    if (msg.type === 'received' && msg.hasMMS) {
+      // Special MMS block
+      const block = document.createElement('div');
+      block.className = 'msg-block';
+      const textLines = msg.text.replace(/\n/g, '<br>');
+      block.innerHTML = `
+        <div class="bubble received">${textLines}</div>
+        ${msg.hasMore ? '<div class="more-btn">모두 보기 <span>›</span></div>' : ''}
+        <div class="mms-wrap">
+          <div class="mms-visual">
+            <div class="mms-content">
+              <div class="mms-l">
+                <span class="mms-year">2025 KBS</span>
+                <div class="mms-title">가요<br>대축제</div>
+                <span class="mms-gf">GLOBAL FESTIVAL</span>
+              </div>
+              <div class="mms-r">
+                <div class="mms-event">인천공항 면세점 이벤트 전용</div>
+                <div class="mms-rtitle">별보러가자</div>
+                <div class="mms-badge">VIP 티켓 입장 교환권</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mms-label">${msg.time}</div>
+      `;
+      row.appendChild(block);
+    } else {
+      const bubble = document.createElement('div');
+      bubble.className = `bubble ${msg.type}`;
+      bubble.innerHTML = msg.text.replace(/\n/g, '<br>');
+      // Tap animation
+      bubble.addEventListener('touchstart', () => bubble.style.transform = 'scale(0.95)');
+      bubble.addEventListener('touchend', () => { bubble.style.transform = ''; });
+
+      const time = document.createElement('div');
+      time.className = 'btime';
+      time.textContent = msg.time;
+
+      if (msg.type === 'sent') {
+        row.appendChild(time);
+        row.appendChild(bubble);
+      } else {
+        row.appendChild(bubble);
+        row.appendChild(time);
+      }
+    }
+
+    chat.appendChild(row);
+  });
+
   chat.scrollTop = chat.scrollHeight;
+}
+
+// ===== SEND MESSAGE =====
+function sendMessage() {
+  const input = document.getElementById('msgInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const now = new Date();
+  const h = now.getHours();
+  const m = now.getMinutes().toString().padStart(2,'0');
+  const ampm = h >= 12 ? '午後' : '午前';
+  const hour = h > 12 ? h - 12 : h === 0 ? 12 : h;
+  const timeStr = `${ampm} ${hour}:${m}`;
+
+  state.messages.push({
+    id: state.nextId++,
+    type: 'sent',
+    text: text,
+    time: timeStr,
+    faded: false
+  });
+
+  input.value = '';
+  input.style.height = 'auto';
+
+  // Animate new bubble
+  renderSMSScreen();
+}
+
+// Auto-resize textarea
+document.getElementById('msgInput').addEventListener('input', function() {
+  this.style.height = 'auto';
+  this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+});
+document.getElementById('msgInput').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+// ===== INIT =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+// Start at SMS screen directly
+showSMS();
 </script>
 </body>
 </html>
