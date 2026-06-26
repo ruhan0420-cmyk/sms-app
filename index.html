@@ -790,40 +790,45 @@ if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch
 (function() {
   const el = document.getElementById('chatArea');
   let startY = 0, startScroll = 0, isDragging = false;
-  const MAX_BOUNCE = 80;
+
+  function rubberBand(x) {
+    return x * 0.4 / (1 + x * 0.004);
+  }
 
   el.addEventListener('touchstart', e => {
+    el.style.transition = 'none';
     startY = e.touches[0].clientY;
     startScroll = el.scrollTop;
     isDragging = true;
-    el.style.transition = 'none';
   }, { passive: true });
 
   el.addEventListener('touchmove', e => {
     if (!isDragging) return;
     const dy = startY - e.touches[0].clientY;
-    const newScroll = startScroll + dy;
     const maxScroll = el.scrollHeight - el.clientHeight;
+    const target = startScroll + dy;
 
-    if (newScroll < 0) {
+    if (target < 0) {
       el.scrollTop = 0;
-      const pull = Math.min(-newScroll * 0.3, MAX_BOUNCE);
-      el.style.transform = `translateY(${pull}px)`;
-    } else if (newScroll > maxScroll) {
+      el.style.transform = `translateY(${rubberBand(-target)}px)`;
+    } else if (target > maxScroll) {
       el.scrollTop = maxScroll;
-      const pull = Math.min((newScroll - maxScroll) * 0.3, MAX_BOUNCE);
-      el.style.transform = `translateY(-${pull}px)`;
+      el.style.transform = `translateY(-${rubberBand(target - maxScroll)}px)`;
     } else {
-      el.scrollTop = newScroll;
+      el.scrollTop = target;
       el.style.transform = 'translateY(0)';
     }
   }, { passive: true });
 
-  el.addEventListener('touchend', () => {
+  function onEnd() {
+    if (!isDragging) return;
     isDragging = false;
-    el.style.transition = 'transform 0.55s cubic-bezier(0.15, 0.85, 0.35, 1.0)';
+    el.style.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
     el.style.transform = 'translateY(0)';
-  });
+  }
+
+  el.addEventListener('touchend', onEnd);
+  el.addEventListener('touchcancel', onEnd);
 })();
 
 showSMS();
