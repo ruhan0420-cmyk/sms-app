@@ -727,26 +727,29 @@ function renderSMS() {
     } else {
       const b=document.createElement('div');
       b.className=`bubble ${msg.type==='sent'?'sent':'received'}`;
+      b.innerHTML = msg.text ? msg.text.replace(/\n/g,'<br>') : '';
+      b.addEventListener('touchstart',()=>b.style.opacity='0.7',{passive:true});
+      b.addEventListener('touchend',()=>b.style.opacity='');
+
       if (msg.image) {
         const imgEl = document.createElement('img');
         imgEl.src = msg.image;
-        imgEl.style.cssText = 'width:100%;max-width:220px;border-radius:14px;display:block;cursor:pointer;';
+        imgEl.style.cssText = 'width:100%;max-width:260px;border-radius:14px;display:block;cursor:pointer;margin-top:4px;';
         imgEl.onclick = () => openImgViewer(msg.image);
-        b.appendChild(imgEl);
-        if (msg.text) {
-          const t = document.createElement('div');
-          t.style.marginTop = '6px';
-          t.innerHTML = msg.text.replace(/\n/g,'<br>');
-          b.appendChild(t);
-        }
+
+        const imgRow = document.createElement('div');
+        imgRow.className = `bubble-row ${msg.type==='sent'?'sent':'received'}`;
+        imgRow.style.marginTop = '2px';
+        imgRow.appendChild(imgEl);
+
+        if (msg.text) row.appendChild(b);
+        inner.appendChild(row);
+        inner.appendChild(imgRow);
       } else {
-        b.innerHTML = msg.text.replace(/\n/g,'<br>');
+        row.appendChild(b);
+        inner.appendChild(row);
       }
-      b.addEventListener('touchstart',()=>b.style.opacity='0.7',{passive:true});
-      b.addEventListener('touchend',()=>b.style.opacity='');
-      row.appendChild(b);
     }
-    inner.appendChild(row);
   });
   // Scroll to bottom
   requestAnimationFrame(() => { chat.scrollTop = chat.scrollHeight; });
