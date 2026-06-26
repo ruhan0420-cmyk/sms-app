@@ -786,45 +786,65 @@ document.getElementById('msgInput').addEventListener('keydown',e=>{
 
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 
-// ── BOUNCE SCROLL ──
+// ── SMOOTH BOUNCE SCROLL ──
 (function() {
   const el = document.getElementById('chatArea');
-  let startY = 0, startScroll = 0, isDragging = false;
+  let startY = 0, startScroll = 0;
+  let pulling = false, animFrame = null;
+  let currentOffset = 0, targetOffset = 0;
 
   function rubberBand(x) {
-    return x * 0.4 / (1 + x * 0.004);
+    return x * 0.55 / (1 + x * 0.0025);
+  }
+
+  function lerp(a, b, t) { return a + (b - a) * t; }
+
+  function applyOffset(offset) {
+    currentOffset = offset;
+    el.style.transform = offset === 0 ? '' : `translateY(${offset}px)`;
   }
 
   el.addEventListener('touchstart', e => {
-    el.style.transition = 'none';
+    cancelAnimationFrame(animFrame);
     startY = e.touches[0].clientY;
     startScroll = el.scrollTop;
-    isDragging = true;
+    pulling = true;
+    el.style.transition = 'none';
   }, { passive: true });
 
   el.addEventListener('touchmove', e => {
-    if (!isDragging) return;
+    if (!pulling) return;
     const dy = startY - e.touches[0].clientY;
     const maxScroll = el.scrollHeight - el.clientHeight;
     const target = startScroll + dy;
 
     if (target < 0) {
       el.scrollTop = 0;
-      el.style.transform = `translateY(${rubberBand(-target)}px)`;
+      applyOffset(rubberBand(-target));
     } else if (target > maxScroll) {
       el.scrollTop = maxScroll;
-      el.style.transform = `translateY(-${rubberBand(target - maxScroll)}px)`;
+      applyOffset(-rubberBand(target - maxScroll));
     } else {
       el.scrollTop = target;
-      el.style.transform = 'translateY(0)';
+      applyOffset(0);
     }
   }, { passive: true });
 
+  function springBack() {
+    currentOffset = lerp(currentOffset, 0, 0.18);
+    el.style.transform = `translateY(${currentOffset}px)`;
+    if (Math.abs(currentOffset) > 0.3) {
+      animFrame = requestAnimationFrame(springBack);
+    } else {
+      el.style.transform = '';
+    }
+  }
+
   function onEnd() {
-    if (!isDragging) return;
-    isDragging = false;
-    el.style.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
-    el.style.transform = 'translateY(0)';
+    if (!pulling) return;
+    pulling = false;
+    el.style.transition = 'none';
+    animFrame = requestAnimationFrame(springBack);
   }
 
   el.addEventListener('touchend', onEnd);
