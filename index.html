@@ -16,91 +16,166 @@
 
 body {
   font-family:-apple-system,'Helvetica Neue',sans-serif;
-  background:#f2f2f7;
+  background:#000;
   height:100dvh;
   overflow:hidden;
 }
 
-/* SCREENS */
 .screen {
   display:none;
   flex-direction:column;
   height:100dvh;
   position:absolute;
-  width:100%;
-  top:0; left:0;
-  background:#f2f2f7;
-  transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+  width:100%; top:0; left:0;
 }
-.screen.active { display:flex; transform:translateX(0); }
-.screen.slide-in { transform:translateX(100%); }
-.screen.slide-out { transform:translateX(-30%); }
+/* Contact screen slide */
+#contactScreen {
+  transform: translateX(100%);
+  transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
+  display: flex !important;
+}
+#contactScreen.open {
+  transform: translateX(0);
+}
 
-/* NAV */
-.nav {
-  background:rgba(242,242,247,0.95);
+
+/* ── SMS SCREEN ── */
+#smsScreen { background:#000; }
+
+.sms-nav {
+  background:rgba(28,28,30,0.92);
   backdrop-filter:blur(20px);
   -webkit-backdrop-filter:blur(20px);
   padding-top:max(var(--safe-top),8px);
-  padding-bottom:11px;
-  padding-left:16px;
+  padding-bottom:10px;
+  padding-left:8px;
   padding-right:16px;
   display:flex;
   align-items:center;
-  border-bottom:0.5px solid rgba(0,0,0,0.15);
+  border-bottom:0.5px solid rgba(255,255,255,0.1);
   flex-shrink:0;
-  min-height:44px;
 }
-.nav-left { flex:1; display:flex; align-items:center; }
-.nav-center { flex:2; text-align:center; }
-.nav-right { flex:1; display:flex; justify-content:flex-end; align-items:center; }
-.nav-title { font-size:17px; font-weight:600; color:#000; }
-.nav-btn { color:#007aff; font-size:17px; cursor:pointer; user-select:none; white-space:nowrap; }
-.nav-btn-bold { font-weight:600; }
-.nav-back-btn {
-  color:#007aff; font-size:17px; cursor:pointer; user-select:none;
-  display:flex; align-items:center; gap:3px;
+.sms-nav-back {
+  color:#007aff;
+  font-size:17px;
+  display:flex;
+  align-items:center;
+  gap:2px;
+  cursor:pointer;
+  padding:6px 8px;
+  flex-shrink:0;
 }
-.nav-back-btn svg { width:10px; height:16px; fill:none; stroke:#007aff; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
-
-/* AVATAR */
-.nav-avatar-wrap { display:flex; flex-direction:column; align-items:center; gap:2px; }
-.nav-avatar { width:36px; height:36px; background:#8e8e93; border-radius:50%; display:flex; align-items:center; justify-content:center; }
-.nav-avatar svg { width:22px; height:22px; fill:#fff; }
-.nav-phone { font-size:12px; font-weight:600; color:#000; }
-
-/* SMS CHAT */
-.chat-area {
-  flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch;
-  padding:12px 16px 16px;
-  display:flex; flex-direction:column; gap:2px;
-}
-.chat-area::-webkit-scrollbar { display:none; }
-.date-divider { text-align:center; font-size:12px; color:#8e8e93; margin:10px 0 6px; }
-
-.bubble-row { display:flex; align-items:flex-end; gap:6px; }
-.bubble-row.received { justify-content:flex-start; }
-.bubble-row.sent { justify-content:flex-end; }
-.bubble-row.new { animation:popIn 0.3s cubic-bezier(0.34,1.56,0.64,1); }
-@keyframes popIn { from{opacity:0;transform:scale(0.7) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
-
-.bubble {
-  max-width:78%; padding:10px 14px; border-radius:18px;
-  font-size:15px; line-height:1.46; word-break:break-word;
+.sms-nav-back svg { width:10px; height:16px; fill:none; stroke:#007aff; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+.sms-nav-center {
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
   cursor:pointer;
 }
-.bubble:active { transform:scale(0.95); transition:transform 0.1s; }
-.bubble.received { background:#fff; color:#000; border-bottom-left-radius:4px; }
-.bubble.sent { background:#007aff; color:#fff; border-bottom-right-radius:4px; }
-.btime { font-size:11px; color:#8e8e93; white-space:nowrap; padding-bottom:2px; }
+.sms-avatar {
+  width:40px; height:40px;
+  background:#636366;
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:2px;
+}
+.sms-avatar svg { width:24px; height:24px; fill:#fff; }
+.sms-phone { font-size:13px; font-weight:600; color:#fff; }
+.sms-phone-arrow { font-size:13px; color:#636366; margin-left:2px; }
+.sms-nav-right { display:flex; gap:4px; }
+.sms-nav-icon { width:36px; height:36px; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.sms-nav-icon svg { width:22px; height:22px; fill:none; stroke:#007aff; stroke-width:1.8; stroke-linecap:round; }
+
+.chat-area {
+  flex:1;
+  overflow-y:auto;
+  -webkit-overflow-scrolling:touch;
+  padding:8px 0 8px;
+  display:flex;
+  flex-direction:column;
+  background:#000;
+}
+.chat-area::-webkit-scrollbar { display:none; }
+
+/* Date/type divider — iOS style */
+.msg-divider {
+  text-align:center;
+  padding:16px 40px 8px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:1px;
+}
+.msg-divider-type {
+  font-size:12px;
+  color:#8e8e93;
+  font-weight:400;
+}
+.msg-divider-date {
+  font-size:12px;
+  color:#8e8e93;
+}
+
+/* Bubbles */
+.bubble-row {
+  display:flex;
+  align-items:flex-end;
+  gap:6px;
+  padding:1px 12px;
+  margin-bottom:2px;
+}
+.bubble-row.received { justify-content:flex-start; }
+.bubble-row.sent { justify-content:flex-end; }
+.bubble-row.new-bubble { animation:popIn 0.32s cubic-bezier(0.34,1.56,0.64,1); }
+@keyframes popIn { from{opacity:0;transform:scale(0.6) translateY(10px)} to{opacity:1;transform:scale(1) translateY(0)} }
+
+.bubble {
+  max-width:75%;
+  padding:9px 14px;
+  border-radius:18px;
+  font-size:16px;
+  line-height:1.4;
+  word-break:break-word;
+}
+.bubble:active { opacity:0.7; transition:opacity 0.1s; }
+.bubble.received {
+  background:#1c1c1e;
+  color:#fff;
+  border-bottom-left-radius:4px;
+}
+.bubble.sent {
+  background:#0a84ff;
+  color:#fff;
+  border-bottom-right-radius:4px;
+}
+
+.btime {
+  font-size:11px;
+  color:#636366;
+  white-space:nowrap;
+  padding-bottom:2px;
+  padding-left:2px;
+  padding-right:2px;
+}
 .bubble-row.sent .btime { order:-1; }
-.faded { opacity:0.35; filter:blur(1.5px); pointer-events:none; }
 
-.msg-block { max-width:78%; display:flex; flex-direction:column; }
+.faded { opacity:0.3; filter:blur(1.5px); pointer-events:none; }
+
+/* MMS block */
+.msg-block { max-width:75%; display:flex; flex-direction:column; }
 .msg-block .bubble { border-radius:18px 18px 18px 4px; max-width:100%; }
-.more-btn { background:#fff; border-top:0.5px solid #e5e5ea; padding:11px 14px; font-size:15px; color:#000; display:flex; align-items:center; justify-content:space-between; border-radius:0 0 14px 4px; cursor:pointer; }
-.more-btn span { color:#c7c7cc; }
-
+.more-btn {
+  background:#1c1c1e;
+  border-top:0.5px solid #2c2c2e;
+  padding:10px 14px;
+  font-size:15px;
+  color:#fff;
+  display:flex; align-items:center; justify-content:space-between;
+  border-radius:0 0 14px 4px;
+  cursor:pointer;
+}
+.more-btn span { color:#636366; }
 .mms-wrap { margin-top:4px; border-radius:14px; overflow:hidden; width:232px; }
 .mms-visual { height:130px; background:linear-gradient(135deg,#1a0533 0%,#2d0a6b 45%,#0f0a40 100%); position:relative; overflow:hidden; display:flex; align-items:flex-end; }
 .mms-visual::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 28% 65%,rgba(180,50,255,0.4) 0%,transparent 55%),radial-gradient(ellipse at 72% 35%,rgba(70,110,255,0.35) 0%,transparent 50%); }
@@ -114,99 +189,104 @@ body {
 .mms-event { color:rgba(255,220,120,0.85); font-size:8px; font-weight:600; text-align:right; line-height:1.3; }
 .mms-rtitle { color:#ffd700; font-size:12px; font-weight:800; }
 .mms-badge { background:rgba(180,130,255,0.85); color:#fff; font-size:8.5px; font-weight:700; padding:3px 7px; border-radius:4px; white-space:nowrap; }
-.mms-label { font-size:11px; color:#8e8e93; padding:3px 4px 0; }
 
+/* Input bar */
 .input-bar {
-  background:rgba(242,242,247,0.95); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px);
-  border-top:0.5px solid rgba(0,0,0,0.12);
-  padding:10px 12px; padding-bottom:max(calc(var(--safe-bottom)+6px),16px);
-  display:flex; align-items:flex-end; gap:10px; flex-shrink:0;
+  background:rgba(28,28,30,0.95);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-top:0.5px solid rgba(255,255,255,0.1);
+  padding:8px 12px;
+  padding-bottom:max(calc(var(--safe-bottom)+4px),16px);
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+  flex-shrink:0;
 }
-.plus-btn { color:#007aff; font-size:28px; font-weight:300; cursor:pointer; padding-bottom:3px; }
-.msg-input {
-  flex:1; background:#fff; border:0.5px solid #d1d1d6; border-radius:20px;
-  padding:8px 14px; font-size:15px; outline:none; color:#000; font-family:inherit;
-  resize:none; max-height:120px; line-height:1.4;
-}
-.msg-input::placeholder { color:#8e8e93; }
-.send-btn { width:33px; height:33px; background:#007aff; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:transform 0.15s; }
+.input-plus { color:#0a84ff; font-size:30px; font-weight:200; cursor:pointer; padding-bottom:1px; line-height:1; }
+.input-wrap { flex:1; display:flex; align-items:flex-end; background:#1c1c1e; border-radius:20px; border:0.5px solid #3a3a3c; padding:6px 12px; gap:8px; }
+.input-field { flex:1; background:transparent; border:none; outline:none; font-size:16px; color:#fff; font-family:inherit; resize:none; max-height:100px; line-height:1.4; }
+.input-field::placeholder { color:#636366; }
+.send-btn { width:30px; height:30px; background:#0a84ff; border-radius:50%; display:flex; align-items:center; justify-content:center; cursor:pointer; flex-shrink:0; transition:transform 0.15s; }
 .send-btn:active { transform:scale(0.85); }
-.send-btn svg { width:14px; height:14px; }
+.send-btn svg { width:13px; height:13px; }
 
-/* PASSWORD */
-.pw-screen { justify-content:center; align-items:center; gap:20px; padding:32px; }
-.pw-icon { width:72px; height:72px; background:#007aff; border-radius:18px; display:flex; align-items:center; justify-content:center; }
-.pw-icon svg { width:38px; height:38px; fill:#fff; }
-.pw-title { font-size:22px; font-weight:700; }
-.pw-sub { font-size:15px; color:#8e8e93; text-align:center; line-height:1.5; }
-.pw-input { width:100%; max-width:260px; background:#fff; border:0.5px solid #d1d1d6; border-radius:12px; padding:14px; font-size:20px; text-align:center; letter-spacing:6px; outline:none; font-family:inherit; }
-.pw-btn { width:100%; max-width:260px; background:#007aff; color:#fff; border-radius:12px; padding:14px; text-align:center; font-size:16px; font-weight:600; cursor:pointer; }
-.pw-btn:active { opacity:0.8; }
-.pw-err { color:#ff3b30; font-size:14px; min-height:18px; }
+/* ── EDIT SCREENS ── */
+.edit-screen { background:#f2f2f7; }
 
-/* EDIT LIST */
-.edit-list-body { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
-.edit-list-body::-webkit-scrollbar { display:none; }
+.nav {
+  background:rgba(242,242,247,0.95);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  padding-top:max(var(--safe-top),8px);
+  padding-bottom:11px;
+  padding-left:16px; padding-right:16px;
+  display:flex; align-items:center;
+  border-bottom:0.5px solid rgba(0,0,0,0.15);
+  flex-shrink:0;
+}
+.nav-left { flex:1; }
+.nav-center { flex:2; text-align:center; }
+.nav-right { flex:1; display:flex; justify-content:flex-end; }
+.nav-title { font-size:17px; font-weight:600; color:#000; }
+.nav-btn { color:#007aff; font-size:17px; cursor:pointer; user-select:none; }
+.nav-btn-bold { font-weight:600; }
+.nav-back-btn { color:#007aff; font-size:17px; cursor:pointer; user-select:none; display:flex; align-items:center; gap:3px; }
+.nav-back-btn svg { width:10px; height:16px; fill:none; stroke:#007aff; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+
+.edit-body { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+.edit-body::-webkit-scrollbar { display:none; }
 .section-label { font-size:13px; color:#8e8e93; text-transform:uppercase; letter-spacing:0.3px; padding:20px 16px 6px; }
 .list-card { background:#fff; border-radius:12px; margin:0 16px; overflow:hidden; }
-.list-row {
-  display:flex; align-items:center; padding:13px 16px;
-  border-bottom:0.5px solid #f2f2f7; gap:12px; cursor:pointer;
-}
+.list-row { display:flex; align-items:center; padding:13px 16px; border-bottom:0.5px solid #f2f2f7; gap:12px; cursor:pointer; }
 .list-row:last-child { border-bottom:none; }
 .list-row:active { background:#f5f5f5; }
 .list-row-label { font-size:15px; color:#000; flex:1; }
 .list-row-value { font-size:15px; color:#8e8e93; max-width:55%; text-align:right; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.list-row-arrow { color:#c7c7cc; font-size:14px; margin-left:6px; }
+.list-row-arrow { color:#c7c7cc; font-size:16px; margin-left:4px; }
 
-.msg-list-item {
-  display:flex; align-items:center; padding:13px 16px;
-  border-bottom:0.5px solid #f2f2f7; gap:12px; cursor:pointer;
-}
-.msg-list-item:active { background:#f5f5f5; }
-.msg-list-item-left { flex:1; overflow:hidden; }
-.msg-list-item-title { font-size:15px; color:#000; margin-bottom:2px; }
-.msg-list-item-preview { font-size:13px; color:#8e8e93; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
-.msg-list-item-badge { font-size:12px; padding:3px 8px; border-radius:8px; font-weight:500; flex-shrink:0; }
+.msg-item { display:flex; align-items:center; padding:13px 16px; border-bottom:0.5px solid #f2f2f7; gap:12px; cursor:pointer; }
+.msg-item:active { background:#f5f5f5; }
+.msg-item-left { flex:1; overflow:hidden; }
+.msg-item-title { font-size:15px; color:#000; margin-bottom:2px; }
+.msg-item-preview { font-size:13px; color:#8e8e93; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.badge { font-size:11px; padding:3px 7px; border-radius:7px; font-weight:500; flex-shrink:0; }
 .badge-received { background:#e8f4ff; color:#007aff; }
 .badge-sent { background:#e8ffe8; color:#34c759; }
+.badge-mms { background:#fff0e8; color:#ff9500; }
 
-.add-row {
-  display:flex; align-items:center; justify-content:center;
-  padding:13px 16px; color:#007aff; font-size:15px; cursor:pointer; gap:6px;
-}
+.add-row { display:flex; align-items:center; justify-content:center; padding:13px 16px; color:#007aff; font-size:15px; cursor:pointer; }
 .add-row:active { background:#f5f5f5; }
-
-.apply-btn {
-  margin:20px 16px; padding:15px; background:#34c759; color:#fff;
-  border-radius:12px; text-align:center; font-size:16px; font-weight:600;
-  cursor:pointer;
-}
+.apply-btn { margin:20px 16px; padding:15px; background:#34c759; color:#fff; border-radius:12px; text-align:center; font-size:16px; font-weight:600; cursor:pointer; }
 .apply-btn:active { opacity:0.8; }
 
-/* DETAIL EDIT */
-.detail-body { flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:40px; }
-.detail-body::-webkit-scrollbar { display:none; }
+/* Detail */
 .detail-field { background:#fff; border-radius:12px; margin:0 16px; overflow:hidden; }
 .detail-row { display:flex; align-items:flex-start; padding:13px 16px; border-bottom:0.5px solid #f2f2f7; gap:12px; }
 .detail-row:last-child { border-bottom:none; }
-.detail-label { font-size:15px; color:#8e8e93; width:48px; flex-shrink:0; padding-top:1px; }
-.detail-input {
-  flex:1; border:none; outline:none; font-size:15px; color:#000;
-  font-family:inherit; background:transparent; padding:0;
-}
-.detail-textarea {
-  flex:1; border:none; outline:none; font-size:15px; color:#000;
-  font-family:inherit; background:transparent; resize:none; min-height:100px; line-height:1.5; padding:0;
-}
-.detail-input::placeholder, .detail-textarea::placeholder { color:#c7c7cc; }
+.detail-label { font-size:15px; color:#8e8e93; width:52px; flex-shrink:0; padding-top:1px; }
+.detail-input { flex:1; border:none; outline:none; font-size:15px; color:#000; font-family:inherit; background:transparent; }
+.detail-input::placeholder { color:#c7c7cc; }
+.detail-textarea { flex:1; border:none; outline:none; font-size:15px; color:#000; font-family:inherit; background:transparent; resize:none; min-height:120px; line-height:1.5; }
+.detail-textarea::placeholder { color:#c7c7cc; }
 
-.type-section { background:#fff; border-radius:12px; margin:0 16px; padding:13px 16px; display:flex; gap:10px; }
+.type-row { display:flex; gap:8px; padding:12px 16px; background:#fff; border-radius:12px; margin:0 16px; }
 .type-pill { flex:1; padding:9px; border-radius:9px; text-align:center; font-size:15px; cursor:pointer; border:1px solid #d1d1d6; color:#8e8e93; background:#f9f9f9; transition:all 0.15s; user-select:none; }
 .type-pill.active { background:#007aff; color:#fff; border-color:#007aff; font-weight:500; }
 
-.del-btn { margin:20px 16px 0; padding:15px; background:#fff; color:#ff3b30; border-radius:12px; text-align:center; font-size:16px; cursor:pointer; border:0.5px solid #ff3b30; }
+.del-btn { margin:16px 16px 0; padding:15px; background:#fff; color:#ff3b30; border-radius:12px; text-align:center; font-size:16px; cursor:pointer; }
 .del-btn:active { background:#fff0f0; }
+
+/* Password */
+.pw-screen { justify-content:center; align-items:center; gap:20px; padding:32px; background:#f2f2f7; }
+.pw-icon { width:72px; height:72px; background:#007aff; border-radius:18px; display:flex; align-items:center; justify-content:center; }
+.pw-icon svg { width:38px; height:38px; fill:#fff; }
+.pw-title { font-size:22px; font-weight:700; color:#000; }
+.pw-sub { font-size:15px; color:#8e8e93; text-align:center; line-height:1.5; }
+.pw-input { width:100%; max-width:260px; background:#fff; border:0.5px solid #d1d1d6; border-radius:12px; padding:14px; font-size:20px; text-align:center; letter-spacing:6px; outline:none; font-family:inherit; color:#000; }
+.pw-btn { width:100%; max-width:260px; background:#007aff; color:#fff; border-radius:12px; padding:14px; text-align:center; font-size:16px; font-weight:600; cursor:pointer; }
+.pw-btn:active { opacity:0.8; }
+.pw-err { color:#ff3b30; font-size:14px; min-height:18px; }
 </style>
 </head>
 <body>
@@ -222,13 +302,13 @@ body {
 </div>
 
 <!-- EDIT LIST -->
-<div class="screen" id="editListScreen">
+<div class="screen edit-screen" id="editListScreen">
   <div class="nav">
     <div class="nav-left"><div class="nav-btn" onclick="showSMS()">キャンセル</div></div>
     <div class="nav-center"><span class="nav-title">編集</span></div>
     <div class="nav-right"><div class="nav-btn nav-btn-bold" onclick="applyAndShowSMS()">完了</div></div>
   </div>
-  <div class="edit-list-body">
+  <div class="edit-body">
     <div class="section-label">送信者</div>
     <div class="list-card">
       <div class="list-row" onclick="openDetail('phone')">
@@ -237,39 +317,21 @@ body {
         <span class="list-row-arrow">›</span>
       </div>
     </div>
-
-    <div class="section-label">日付</div>
-    <div class="list-card">
-      <div class="list-row" onclick="openDetail('date')">
-        <span class="list-row-label">日付</span>
-        <span class="list-row-value" id="datePreview"></span>
-        <span class="list-row-arrow">›</span>
-      </div>
-    </div>
-
     <div class="section-label">メッセージ</div>
-    <div class="list-card" id="msgListCard">
-      <div class="add-row" onclick="addMsg()">＋ メッセージを追加</div>
-    </div>
-
+    <div class="list-card" id="msgListCard"></div>
     <div class="apply-btn" onclick="applyAndShowSMS()">✓ 完了してSMS画面へ</div>
     <div style="height:32px;"></div>
   </div>
 </div>
 
-<!-- DETAIL: phone / date -->
-<div class="screen" id="detailScreen">
+<!-- DETAIL phone -->
+<div class="screen edit-screen" id="detailScreen">
   <div class="nav">
-    <div class="nav-left">
-      <div class="nav-back-btn" onclick="backToList()">
-        <svg viewBox="0 0 10 16"><polyline points="9,1 1,8 9,15"/></svg>
-        編集
-      </div>
-    </div>
+    <div class="nav-left"><div class="nav-back-btn" onclick="backToList()"><svg viewBox="0 0 10 16"><polyline points="9,1 1,8 9,15"/></svg>編集</div></div>
     <div class="nav-center"><span class="nav-title" id="detailTitle"></span></div>
     <div class="nav-right"><div class="nav-btn nav-btn-bold" onclick="saveDetail()">保存</div></div>
   </div>
-  <div class="detail-body">
+  <div class="edit-body">
     <div class="section-label" id="detailSectionLabel"></div>
     <div class="detail-field">
       <div class="detail-row">
@@ -281,59 +343,139 @@ body {
 </div>
 
 <!-- MSG DETAIL -->
-<div class="screen" id="msgDetailScreen">
+<div class="screen edit-screen" id="msgDetailScreen">
   <div class="nav">
-    <div class="nav-left">
-      <div class="nav-back-btn" onclick="backToList()">
-        <svg viewBox="0 0 10 16"><polyline points="9,1 1,8 9,15"/></svg>
-        編集
-      </div>
-    </div>
+    <div class="nav-left"><div class="nav-back-btn" onclick="backToList()"><svg viewBox="0 0 10 16"><polyline points="9,1 1,8 9,15"/></svg>編集</div></div>
     <div class="nav-center"><span class="nav-title" id="msgDetailTitle">メッセージ</span></div>
     <div class="nav-right"><div class="nav-btn nav-btn-bold" onclick="saveMsgDetail()">保存</div></div>
   </div>
-  <div class="detail-body">
+  <div class="edit-body">
     <div class="section-label">種類</div>
-    <div class="type-section">
-      <div class="type-pill" id="typeReceived" onclick="setType('received')">受信</div>
-      <div class="type-pill" id="typeSent" onclick="setType('sent')">送信</div>
+    <div class="type-row">
+      <div class="type-pill" id="typeReceived" onclick="setMsgType('received')">受信 SMS</div>
+      <div class="type-pill" id="typeSent" onclick="setMsgType('sent')">送信</div>
+      <div class="type-pill" id="typeMMS" onclick="setMsgType('mms')">受信 MMS</div>
+    </div>
+
+    <div class="section-label">日付・時刻</div>
+    <div class="detail-field">
+      <div class="detail-row">
+        <div class="detail-label">日付</div>
+        <input class="detail-input" id="msgDate" type="text" placeholder="10月22日(水)">
+      </div>
+      <div class="detail-row">
+        <div class="detail-label">時刻</div>
+        <input class="detail-input" id="msgTime" type="text" placeholder="15:07">
+      </div>
     </div>
 
     <div class="section-label">内容</div>
     <div class="detail-field">
       <div class="detail-row">
-        <textarea class="detail-textarea" id="msgDetailText" placeholder="メッセージ内容を入力"></textarea>
+        <textarea class="detail-textarea" id="msgText" placeholder="メッセージ内容を入力"></textarea>
       </div>
     </div>
 
-    <div class="section-label">時刻</div>
+    <div class="section-label">画像</div>
     <div class="detail-field">
-      <div class="detail-row">
-        <div class="detail-label">時刻</div>
-        <input class="detail-input" id="msgDetailTime" type="text" placeholder="午後 5:24">
+      <div id="imgPreviewWrap" style="display:none; padding:12px 16px; border-bottom:0.5px solid #f2f2f7;">
+        <div style="position:relative; display:inline-block;">
+          <img id="imgPreview" style="max-width:100%; max-height:200px; border-radius:12px; display:block;">
+          <div onclick="removeImage()" style="position:absolute;top:-8px;right:-8px;width:24px;height:24px;background:#636366;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:15px;line-height:1;">×</div>
+        </div>
       </div>
+      <div class="detail-row" style="cursor:pointer;" onclick="document.getElementById('imgFileInput').click()">
+        <div style="color:#007aff;font-size:15px;" id="imgBtnLabel">＋ 画像を追加</div>
+      </div>
+      <input type="file" id="imgFileInput" accept="image/*" style="display:none" onchange="handleImageUpload(event)">
     </div>
 
     <div class="del-btn" onclick="deleteMsgDetail()">このメッセージを削除</div>
+    <div style="height:40px;"></div>
+  </div>
+</div>
+
+<!-- CONTACT SCREEN -->
+<div class="screen" id="contactScreen" style="background:#1c1c1e; z-index:10;">
+  <div style="background:rgba(28,28,30,0.95); backdrop-filter:blur(20px); padding-top:max(var(--safe-top),8px); padding-bottom:10px; padding-left:8px; padding-right:16px; display:flex; align-items:center; border-bottom:0.5px solid rgba(255,255,255,0.1); flex-shrink:0;">
+    <div onclick="closeContact()" style="color:#007aff; font-size:17px; display:flex; align-items:center; gap:3px; cursor:pointer; padding:6px 8px; flex-shrink:0;">
+      <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><polyline points="9,1 1,8 9,15" stroke="#007aff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div style="flex:1; text-align:center; font-size:17px; font-weight:600; color:#fff;">連絡先</div>
+    <div style="width:60px;"></div>
+  </div>
+
+  <div style="flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:40px;">
+    <!-- Avatar + name -->
+    <div style="display:flex; flex-direction:column; align-items:center; padding:32px 16px 24px; gap:12px;">
+      <div style="width:80px; height:80px; background:#636366; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+        <svg width="48" height="48" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" fill="#fff"/></svg>
+      </div>
+      <div id="contactName" style="font-size:22px; font-weight:700; color:#fff;"></div>
+    </div>
+
+    <!-- Action buttons -->
+    <div style="display:flex; justify-content:center; gap:16px; padding:0 16px 28px;">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+        <div style="width:52px; height:52px; background:#2c2c2e; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8z" stroke="#007aff" stroke-width="1.8"/></svg>
+        </div>
+        <span style="font-size:11px; color:#007aff;">電話</span>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+        <div style="width:52px; height:52px; background:#2c2c2e; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z" stroke="#007aff" stroke-width="1.8" stroke-linejoin="round"/></svg>
+        </div>
+        <span style="font-size:11px; color:#007aff;">メッセージ</span>
+      </div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:6px;">
+        <div style="width:52px; height:52px; background:#2c2c2e; border-radius:50%; display:flex; align-items:center; justify-content:center;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="3" stroke="#007aff" stroke-width="1.8"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z" stroke="#007aff" stroke-width="1.8"/></svg>
+        </div>
+        <span style="font-size:11px; color:#007aff;">その他</span>
+      </div>
+    </div>
+
+    <!-- Info card -->
+    <div style="background:#2c2c2e; border-radius:12px; margin:0 16px 20px; overflow:hidden;">
+      <div style="padding:13px 16px; border-bottom:0.5px solid #3a3a3c;">
+        <div style="font-size:12px; color:#8e8e93; margin-bottom:3px;">電話番号</div>
+        <div id="contactPhone" style="font-size:16px; color:#007aff;"></div>
+      </div>
+      <div style="padding:13px 16px;">
+        <div style="font-size:12px; color:#8e8e93; margin-bottom:3px;">メモ</div>
+        <div style="font-size:15px; color:#8e8e93;">なし</div>
+      </div>
+    </div>
+
+    <!-- Block button -->
+    <div style="background:#2c2c2e; border-radius:12px; margin:0 16px; overflow:hidden;">
+      <div style="padding:14px 16px; text-align:center; color:#ff453a; font-size:15px; cursor:pointer;">
+        この発信者を着信拒否
+      </div>
+    </div>
   </div>
 </div>
 
 <!-- SMS SCREEN -->
 <div class="screen" id="smsScreen">
-  <div class="nav">
-    <div class="nav-left"><div class="nav-back-btn"><svg viewBox="0 0 10 16"><polyline points="9,1 1,8 9,15"/></svg>戻る</div></div>
-    <div class="nav-center">
-      <div class="nav-avatar-wrap">
-        <div class="nav-avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg></div>
-        <span class="nav-phone" id="displayPhone"></span>
+  <div class="sms-nav">
+    <div class="sms-nav-back" onclick="goToEdit()"><svg viewBox="0 0 10 16"><polyline points="9,1 1,8 9,15"/></svg></div>
+    <div class="sms-nav-center" onclick="openContact()">
+      <div class="sms-avatar"><svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z" fill="#fff"/></svg></div>
+      <div style="display:flex;align-items:center;gap:2px;">
+        <span class="sms-phone" id="displayPhone"></span>
+        <span class="sms-phone-arrow">›</span>
       </div>
     </div>
-    <div class="nav-right"><div class="nav-btn" onclick="goToEdit()">···</div></div>
+    <div class="sms-nav-right"></div>
   </div>
   <div class="chat-area" id="chatArea"></div>
   <div class="input-bar">
-    <div class="plus-btn">+</div>
-    <textarea class="msg-input" id="msgInput" placeholder="メッセージ" rows="1"></textarea>
+    <div class="input-plus">+</div>
+    <div class="input-wrap">
+      <textarea class="input-field" id="msgInput" placeholder="テキストメッセージ" rows="1"></textarea>
+    </div>
     <div class="send-btn" onclick="sendMsg()">
       <svg viewBox="0 0 14 14" fill="none"><path d="M7 12V2M2 7l5-5 5 5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
@@ -341,187 +483,205 @@ body {
 </div>
 
 <script>
-const PW = '1234';
-
-let state = {
-  phone: '010-●●●●-●●●5',
-  date: '12月18日 木曜日',
-  messages: [
-    { id:1, type:'received', text:'U 1B ㅠ...', time:'午後 12:44', faded:true },
-    { id:2, type:'received', text:'오늘 일괄적으로 모바일티켓(입장권 교환용) 문자 발송예정입니다. 입장권은 현장에서 신분증 확인 후 드립니다 감사합니다', time:'午後 5:24', faded:false },
-    { id:3, type:'received', text:'[Web발신]\n⭐티켓 교환권은 입장권이 아닙니다. 입장권 교환 확인용 티켓입니다.\n\n[인천공항 면세점] \'별 보러 가자\' 참가 확정 안내 (KBS가요대축제 티켓 교환권)\n인천공항면세점앱 에어스타 듀티프리에서 준비한 특별 연말 선물! [2025 KBS가요대축제 글로벌 페스티벌 티켓 교환권]을 발송 드립니다. 공연 당일 [이벤트 티켓 교환 현장 부스]에서 해당 모바일 티켓 교환권을 제시하고 신분증 본인 확인 후 입장권을 교환해 드립니다. (*중요* 유효 신분증 지참)\n\n🔴 이벤트 입장권 교환 부스 안내 🔴\n▷부스 위치: 송도컨벤시아', time:'MMS 午後 6:36', faded:false, hasMMS:true, hasMore:true }
-  ],
-  nextId: 10
-};
-
+const PW = '0606';
 let editingMsgId = null;
 let detailKey = null;
 
+let state = {
+  phone: '010-●●●●-●●●5',
+  messages: [
+    { id:1, type:'received', date:'12月18日(木)', time:'午後 12:44', text:'U 1B ㅠ...', faded:true },
+    { id:2, type:'received', date:'12月18日(木)', time:'午後 5:24', text:'오늘 일괄적으로 모바일티켓(입장권 교환용) 문자 발송예정입니다. 입장권은 현장에서 신분증 확인 후 드립니다 감사합니다', faded:false },
+    { id:3, type:'mms', date:'12月18日(木)', time:'午後 6:36', text:'[Web발신]\n⭐티켓 교환권은 입장권이 아닙니다. 입장권 교환 확인용 티켓입니다.\n\n[인천공항 면세점] \'별 보러 가자\' 참가 확정 안내 (KBS가요대축제 티켓 교환권)\n인천공항면세점앱 에어스타 듀티프리에서 준비한 특별 연말 선물! [2025 KBS가요대축제 글로벌 페스티벌 티켓 교환권]을 발송 드립니다.', faded:false, hasMMS:true }
+  ],
+  nextId:10
+};
+
 // ── SCREENS ──
 function showScreen(id) {
-  document.querySelectorAll('.screen').forEach(s => {
-    s.style.display = 'none';
-    s.classList.remove('active');
-  });
+  document.querySelectorAll('.screen').forEach(s=>{ s.style.display='none'; s.classList.remove('active'); });
   const el = document.getElementById(id);
-  el.style.display = 'flex';
-  el.classList.add('active');
+  el.style.display='flex'; el.classList.add('active');
 }
 
 // ── PASSWORD ──
 function checkPw() {
   if (document.getElementById('pwInput').value === PW) {
-    document.getElementById('pwErr').textContent = '';
-    renderEditList();
-    showScreen('editListScreen');
+    document.getElementById('pwErr').textContent='';
+    renderEditList(); showScreen('editListScreen');
   } else {
-    document.getElementById('pwErr').textContent = 'パスワードが違います';
-    document.getElementById('pwInput').value = '';
+    document.getElementById('pwErr').textContent='パスワードが違います';
+    document.getElementById('pwInput').value='';
   }
 }
-document.getElementById('pwInput').addEventListener('keydown', e => { if(e.key==='Enter') checkPw(); });
+document.getElementById('pwInput').addEventListener('keydown',e=>{ if(e.key==='Enter') checkPw(); });
 
 // ── EDIT LIST ──
 function renderEditList() {
   document.getElementById('phonePreview').textContent = state.phone;
-  document.getElementById('datePreview').textContent = state.date;
-
   const card = document.getElementById('msgListCard');
-  card.innerHTML = '';
-  state.messages.forEach((msg, i) => {
+  card.innerHTML='';
+  state.messages.forEach((msg,i)=>{
     const div = document.createElement('div');
-    div.className = 'msg-list-item';
-    div.onclick = () => openMsgDetail(msg.id);
-    const preview = msg.text.replace(/\n/g,' ').slice(0,30) + (msg.text.length>30?'…':'');
-    const badgeClass = msg.type==='received' ? 'badge-received' : 'badge-sent';
-    const badgeText = msg.type==='received' ? '受信' : '送信';
-    div.innerHTML = `
-      <div class="msg-list-item-left">
-        <div class="msg-list-item-title">メッセージ ${i+1}　<span style="font-size:12px;color:#8e8e93;">${msg.time}</span></div>
-        <div class="msg-list-item-preview">${preview}</div>
+    div.className='msg-item';
+    div.onclick=()=>openMsgDetail(msg.id);
+    const preview = msg.text.replace(/\n/g,' ').slice(0,28)+(msg.text.length>28?'…':'');
+    let badgeClass='badge-received', badgeText='受信 SMS';
+    if(msg.type==='sent'){ badgeClass='badge-sent'; badgeText='送信'; }
+    if(msg.type==='mms'){ badgeClass='badge-mms'; badgeText='MMS'; }
+    div.innerHTML=`
+      <div class="msg-item-left">
+        <div class="msg-item-title">メッセージ${i+1}　<span style="font-size:12px;color:#8e8e93;">${msg.date} ${msg.time}</span></div>
+        <div class="msg-item-preview">${preview}</div>
       </div>
-      <span class="msg-list-item-badge ${badgeClass}">${badgeText}</span>
-      <span style="color:#c7c7cc;font-size:14px;margin-left:4px;">›</span>
+      <span class="badge ${badgeClass}">${badgeText}</span>
+      <span style="color:#c7c7cc;font-size:16px;margin-left:4px;">›</span>
     `;
     card.appendChild(div);
   });
-  const addRow = document.createElement('div');
-  addRow.className = 'add-row';
-  addRow.onclick = addMsg;
-  addRow.innerHTML = '＋ メッセージを追加';
+  const addRow=document.createElement('div');
+  addRow.className='add-row'; addRow.onclick=addMsg;
+  addRow.textContent='＋ メッセージを追加';
   card.appendChild(addRow);
 }
 
 function openDetail(key) {
-  detailKey = key;
-  if (key === 'phone') {
-    document.getElementById('detailTitle').textContent = '電話番号';
-    document.getElementById('detailSectionLabel').textContent = '送信者';
-    document.getElementById('detailLabel').textContent = '番号';
-    document.getElementById('detailInput').value = state.phone;
-    document.getElementById('detailInput').placeholder = '010-0000-0000';
-  } else {
-    document.getElementById('detailTitle').textContent = '日付';
-    document.getElementById('detailSectionLabel').textContent = '日付';
-    document.getElementById('detailLabel').textContent = '日付';
-    document.getElementById('detailInput').value = state.date;
-    document.getElementById('detailInput').placeholder = '12月18日 木曜日';
-  }
+  detailKey=key;
+  document.getElementById('detailTitle').textContent='電話番号';
+  document.getElementById('detailSectionLabel').textContent='送信者';
+  document.getElementById('detailLabel').textContent='番号';
+  document.getElementById('detailInput').value=state.phone;
+  document.getElementById('detailInput').placeholder='010-0000-0000';
   showScreen('detailScreen');
-  setTimeout(() => document.getElementById('detailInput').focus(), 100);
+  setTimeout(()=>document.getElementById('detailInput').focus(),100);
 }
-
 function saveDetail() {
-  const val = document.getElementById('detailInput').value.trim();
-  if (detailKey === 'phone') state.phone = val || state.phone;
-  else state.date = val || state.date;
-  renderEditList();
-  showScreen('editListScreen');
+  const val=document.getElementById('detailInput').value.trim();
+  if(val) state.phone=val;
+  renderEditList(); showScreen('editListScreen');
 }
-
-function backToList() {
-  renderEditList();
-  showScreen('editListScreen');
-}
+function backToList() { renderEditList(); showScreen('editListScreen'); }
 
 // ── MSG DETAIL ──
 function openMsgDetail(id) {
-  editingMsgId = id;
-  const msg = state.messages.find(m => m.id === id);
-  const idx = state.messages.indexOf(msg);
-  document.getElementById('msgDetailTitle').textContent = `メッセージ ${idx+1}`;
-  document.getElementById('msgDetailText').value = msg.text;
-  document.getElementById('msgDetailTime').value = msg.time;
-  setType(msg.type);
+  editingMsgId=id;
+  const msg=state.messages.find(m=>m.id===id);
+  const idx=state.messages.indexOf(msg);
+  document.getElementById('msgDetailTitle').textContent=`メッセージ${idx+1}`;
+  document.getElementById('msgText').value=msg.text;
+  document.getElementById('msgDate').value=msg.date;
+  document.getElementById('msgTime').value=msg.time;
+  setMsgType(msg.type);
+  // Image
+  if (msg.image) {
+    document.getElementById('imgPreview').src = msg.image;
+    document.getElementById('imgPreviewWrap').style.display = 'block';
+    document.getElementById('imgBtnLabel').textContent = '画像を変更';
+  } else {
+    document.getElementById('imgPreviewWrap').style.display = 'none';
+    document.getElementById('imgBtnLabel').textContent = '＋ 画像を追加';
+  }
   showScreen('msgDetailScreen');
 }
-
-function setType(type) {
-  document.getElementById('typeReceived').classList.toggle('active', type==='received');
-  document.getElementById('typeSent').classList.toggle('active', type==='sent');
-  document.getElementById('typeReceived').dataset.val = 'received';
-  document.getElementById('typeSent').dataset.val = 'sent';
-  // store current selection
-  document.getElementById('msgDetailScreen').dataset.type = type;
+function setMsgType(type) {
+  document.getElementById('typeReceived').classList.toggle('active',type==='received');
+  document.getElementById('typeSent').classList.toggle('active',type==='sent');
+  document.getElementById('typeMMS').classList.toggle('active',type==='mms');
+  document.getElementById('msgDetailScreen').dataset.type=type;
 }
-
 function saveMsgDetail() {
-  const msg = state.messages.find(m => m.id === editingMsgId);
-  if (!msg) return backToList();
-  msg.text = document.getElementById('msgDetailText').value;
-  msg.time = document.getElementById('msgDetailTime').value;
-  msg.type = document.getElementById('msgDetailScreen').dataset.type || msg.type;
+  const msg=state.messages.find(m=>m.id===editingMsgId);
+  if(!msg) return backToList();
+  msg.text=document.getElementById('msgText').value;
+  msg.date=document.getElementById('msgDate').value;
+  msg.time=document.getElementById('msgTime').value;
+  msg.type=document.getElementById('msgDetailScreen').dataset.type||msg.type;
+  msg.hasMMS = msg.type==='mms';
+  // Save image
+  const imgEl = document.getElementById('imgPreview');
+  if (imgEl.src && imgEl.src !== window.location.href) {
+    msg.image = imgEl.src;
+  }
   backToList();
 }
-
-function deleteMsgDetail() {
-  state.messages = state.messages.filter(m => m.id !== editingMsgId);
-  backToList();
+function handleImageUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    document.getElementById('imgPreview').src = ev.target.result;
+    document.getElementById('imgPreviewWrap').style.display = 'block';
+    document.getElementById('imgBtnLabel').textContent = '画像を変更';
+    // Also save to current msg immediately
+    const msg = state.messages.find(m=>m.id===editingMsgId);
+    if (msg) msg.image = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
 }
-
+function removeImage() {
+  document.getElementById('imgPreview').src = '';
+  document.getElementById('imgPreviewWrap').style.display = 'none';
+  document.getElementById('imgBtnLabel').textContent = '＋ 画像を追加';
+  const msg = state.messages.find(m=>m.id===editingMsgId);
+  if (msg) delete msg.image;
+}
+function deleteMsgDetail() { state.messages=state.messages.filter(m=>m.id!==editingMsgId); backToList(); }
 function addMsg() {
-  const id = state.nextId++;
-  state.messages.push({ id, type:'received', text:'', time:'午後 0:00', faded:false });
+  const id=state.nextId++;
+  state.messages.push({id,type:'received',date:'',time:'',text:'',faded:false});
   openMsgDetail(id);
 }
-
-// ── APPLY & SMS ──
 function applyAndShowSMS() { showSMS(); }
 
-function showSMS() {
-  renderSMS();
-  showScreen('smsScreen');
+// ── SMS ──
+function openContact() {
+  document.getElementById('contactName').textContent = state.phone;
+  document.getElementById('contactPhone').textContent = state.phone;
+  document.getElementById('contactScreen').classList.add('open');
+}
+function closeContact() {
+  document.getElementById('contactScreen').classList.remove('open');
 }
 
+function showSMS() { renderSMS(); showScreen('smsScreen'); }
 function goToEdit() {
   showScreen('pwScreen');
-  document.getElementById('pwInput').value = '';
-  document.getElementById('pwErr').textContent = '';
+  document.getElementById('pwInput').value='';
+  document.getElementById('pwErr').textContent='';
 }
 
 function renderSMS() {
-  document.getElementById('displayPhone').textContent = state.phone;
-  const chat = document.getElementById('chatArea');
-  chat.innerHTML = '';
+  document.getElementById('displayPhone').textContent=state.phone;
+  const chat=document.getElementById('chatArea');
+  chat.innerHTML='';
 
-  if (state.date) {
-    const d = document.createElement('div');
-    d.className = 'date-divider';
-    d.textContent = state.date;
-    chat.appendChild(d);
-  }
+  let lastDate = null;
 
-  state.messages.forEach(msg => {
-    const row = document.createElement('div');
-    row.className = `bubble-row ${msg.type}${msg.faded?' faded':''}`;
+  state.messages.forEach(msg=>{
+    const div=document.createElement('div');
+    div.className='msg-divider';
+    const typeLabel = msg.type==='mms' ? 'テキストメッセージ・MMS' : 'テキストメッセージ・SMS';
 
-    if (msg.hasMMS) {
-      const block = document.createElement('div');
-      block.className = 'msg-block';
-      block.innerHTML = `
-        <div class="bubble received">${msg.text.replace(/\n/g,'<br>')}</div>
-        ${msg.hasMore?'<div class="more-btn">모두 보기 <span>›</span></div>':''}
-        <div class="mms-wrap">
+    if (msg.date !== lastDate) {
+      // New date: show type + date + time
+      div.innerHTML=`<span class="msg-divider-type">${typeLabel}</span><span class="msg-divider-date">${msg.date}　${msg.time}</span>`;
+      lastDate = msg.date;
+    } else {
+      // Same date: show type + time only
+      div.innerHTML=`<span class="msg-divider-type">${typeLabel}</span><span class="msg-divider-date">${msg.time}</span>`;
+    }
+    chat.appendChild(div);
+
+    const row=document.createElement('div');
+    row.className=`bubble-row ${msg.type==='sent'?'sent':'received'}${msg.faded?' faded':''}`;
+
+    if(msg.hasMMS && msg.type==='mms') {
+      const block=document.createElement('div');
+      block.className='msg-block';
+      const imgHtml = msg.image
+        ? `<img src="${msg.image}" onclick="openImgViewer(this.src)" style="width:100%;max-width:260px;border-radius:14px;display:block;margin-top:4px;cursor:pointer;">`
+        : `<div class="mms-wrap">
           <div class="mms-visual">
             <div class="mms-content">
               <div class="mms-l">
@@ -536,56 +696,103 @@ function renderSMS() {
               </div>
             </div>
           </div>
-        </div>
-        <div class="mms-label">${msg.time}</div>
-      `;
+        </div>`;
+      const textPart = msg.text ? `<div class="bubble received">${msg.text.replace(/\n/g,'<br>')}</div>${msg.hasMore?'<div class="more-btn">모두 보기 <span>›</span></div>':''}` : '';
+      block.innerHTML = textPart + imgHtml;
       row.appendChild(block);
     } else {
-      const b = document.createElement('div');
-      b.className = `bubble ${msg.type}`;
-      b.innerHTML = msg.text.replace(/\n/g,'<br>');
-      b.addEventListener('touchstart',()=>b.style.transform='scale(0.95)',{passive:true});
-      b.addEventListener('touchend',()=>b.style.transform='');
-      const t = document.createElement('div');
-      t.className = 'btime';
-      t.textContent = msg.time;
-      if (msg.type==='sent') { row.appendChild(t); row.appendChild(b); }
-      else { row.appendChild(b); row.appendChild(t); }
+      const b=document.createElement('div');
+      b.className=`bubble ${msg.type==='sent'?'sent':'received'}`;
+      if (msg.image) {
+        const imgEl = document.createElement('img');
+        imgEl.src = msg.image;
+        imgEl.style.cssText = 'width:100%;max-width:220px;border-radius:14px;display:block;cursor:pointer;';
+        imgEl.onclick = () => openImgViewer(msg.image);
+        b.appendChild(imgEl);
+        if (msg.text) {
+          const t = document.createElement('div');
+          t.style.marginTop = '6px';
+          t.innerHTML = msg.text.replace(/\n/g,'<br>');
+          b.appendChild(t);
+        }
+      } else {
+        b.innerHTML = msg.text.replace(/\n/g,'<br>');
+      }
+      b.addEventListener('touchstart',()=>b.style.opacity='0.7',{passive:true});
+      b.addEventListener('touchend',()=>b.style.opacity='');
+      row.appendChild(b);
     }
     chat.appendChild(row);
   });
-  chat.scrollTop = chat.scrollHeight;
+  chat.scrollTop=chat.scrollHeight;
 }
 
 // ── SEND ──
 function sendMsg() {
-  const input = document.getElementById('msgInput');
-  const text = input.value.trim();
-  if (!text) return;
-  const now = new Date();
-  const h = now.getHours(), m = String(now.getMinutes()).padStart(2,'0');
-  const ap = h>=12?'午後':'午前';
-  const hr = h>12?h-12:h===0?12:h;
-  state.messages.push({ id:state.nextId++, type:'sent', text, time:`${ap} ${hr}:${m}`, faded:false });
+  const input=document.getElementById('msgInput');
+  const text=input.value.trim();
+  if(!text) return;
+  const now=new Date();
+  const h=now.getHours(), m=String(now.getMinutes()).padStart(2,'0');
+  const ap=h>=12?'午後':'午前';
+  const hr=h>12?h-12:h===0?12:h;
+  const mo=now.getMonth()+1, d=now.getDate();
+  const days=['日','月','火','水','木','金','土'];
+  const day=days[now.getDay()];
+  state.messages.push({
+    id:state.nextId++, type:'sent',
+    date:`${mo}月${d}日(${day})`, time:`${ap} ${hr}:${m}`,
+    text, faded:false
+  });
   input.value=''; input.style.height='auto';
   renderSMS();
-  // animate last bubble
-  const bubbles = document.querySelectorAll('.bubble-row');
-  const last = bubbles[bubbles.length-1];
-  if(last) { last.classList.add('new'); setTimeout(()=>last.classList.remove('new'),400); }
+  const rows=document.querySelectorAll('.bubble-row');
+  const last=rows[rows.length-1];
+  if(last){last.classList.add('new-bubble');setTimeout(()=>last.classList.remove('new-bubble'),400);}
 }
-
 document.getElementById('msgInput').addEventListener('input',function(){
   this.style.height='auto';
-  this.style.height=Math.min(this.scrollHeight,120)+'px';
+  this.style.height=Math.min(this.scrollHeight,100)+'px';
 });
 document.getElementById('msgInput').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMsg();}
 });
 
-// ── INIT ──
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 showSMS();
 </script>
 </body>
 </html>
+
+<!-- FULLSCREEN IMAGE VIEWER -->
+<div id="imgViewer" onclick="imgViewerTap()" style="display:none; position:fixed; inset:0; background:#000; z-index:9999; align-items:center; justify-content:center;">
+  <img id="imgViewerImg" style="max-width:100%; max-height:100dvh; object-fit:contain; display:block;">
+  <div id="imgViewerClose" onclick="event.stopPropagation(); closeImgViewer();" style="display:none; position:fixed; top:max(60px, calc(env(safe-area-inset-top) + 16px)); right:20px; width:36px; height:36px; background:rgba(60,60,60,0.85); border-radius:50%; align-items:center; justify-content:center; cursor:pointer; z-index:10000;">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+  </div>
+</div>
+<script>
+let _ivClose = false, _ivTimer = null;
+function openImgViewer(src) {
+  const v = document.getElementById('imgViewer');
+  document.getElementById('imgViewerImg').src = src;
+  v.style.display = 'flex';
+  _ivClose = false;
+  document.getElementById('imgViewerClose').style.display = 'none';
+}
+function closeImgViewer() {
+  document.getElementById('imgViewer').style.display = 'none';
+  _ivClose = false; clearTimeout(_ivTimer);
+}
+function imgViewerTap() {
+  const btn = document.getElementById('imgViewerClose');
+  if (!_ivClose) {
+    _ivClose = true;
+    btn.style.display = 'flex';
+    clearTimeout(_ivTimer);
+    _ivTimer = setTimeout(() => { btn.style.display='none'; _ivClose=false; }, 3000);
+  } else {
+    closeImgViewer();
+  }
+}
+</script>
