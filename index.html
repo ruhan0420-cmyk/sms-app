@@ -28,19 +28,31 @@ body {
   position:absolute;
   width:100%; top:0; left:0;
 }
-/* Contact screen slide */
+/* Contact screen - iOS push style */
 #contactScreen {
   transform: translateX(100%);
-  transition: transform 0.32s cubic-bezier(0.4,0,0.2,1);
   display: flex !important;
+  transition: transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 20;
 }
 #contactScreen.open {
   transform: translateX(0);
 }
-
-
-/* ── SMS SCREEN ── */
-#smsScreen { background:#000; }
+#smsScreen.pushed::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.2);
+  z-index: 5;
+  pointer-events: none;
+}
+#smsScreen {
+  background:#000;
+  transition: transform 0.38s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+#smsScreen.pushed {
+  transform: translateX(-30%);
+}
 
 .sms-nav {
   background:rgba(28,28,30,0.92);
@@ -403,13 +415,14 @@ body {
 </div>
 
 <!-- CONTACT SCREEN -->
-<div class="screen" id="contactScreen" style="background:#1c1c1e; z-index:10;">
+<div class="screen" id="contactScreen" style="background:#1c1c1e; z-index:20; transform:translateX(100%); display:flex !important; transition:transform 0.32s cubic-bezier(0.4,0,0.2,1);">
   <div style="background:rgba(28,28,30,0.95); backdrop-filter:blur(20px); padding-top:max(var(--safe-top),8px); padding-bottom:10px; padding-left:8px; padding-right:16px; display:flex; align-items:center; border-bottom:0.5px solid rgba(255,255,255,0.1); flex-shrink:0;">
     <div onclick="closeContact()" style="color:#007aff; font-size:17px; display:flex; align-items:center; gap:3px; cursor:pointer; padding:6px 8px; flex-shrink:0;">
       <svg width="10" height="16" viewBox="0 0 10 16" fill="none"><polyline points="9,1 1,8 9,15" stroke="#007aff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      メッセージ
     </div>
     <div style="flex:1; text-align:center; font-size:17px; font-weight:600; color:#fff;">連絡先</div>
-    <div style="width:60px;"></div>
+    <div style="width:80px;"></div>
   </div>
 
   <div style="flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:40px;">
@@ -661,10 +674,19 @@ function applyAndShowSMS() { saveState(); showSMS(); }
 function openContact() {
   document.getElementById('contactName').textContent = state.phone;
   document.getElementById('contactPhone').textContent = state.phone;
-  document.getElementById('contactScreen').classList.add('open');
+  const contact = document.getElementById('contactScreen');
+  const sms = document.getElementById('smsScreen');
+  contact.style.display = 'flex';
+  requestAnimationFrame(() => {
+    contact.classList.add('open');
+    sms.classList.add('pushed');
+  });
 }
 function closeContact() {
-  document.getElementById('contactScreen').classList.remove('open');
+  const contact = document.getElementById('contactScreen');
+  const sms = document.getElementById('smsScreen');
+  contact.classList.remove('open');
+  sms.classList.remove('pushed');
 }
 
 function showSMS() { renderSMS(); showScreen('smsScreen'); }
