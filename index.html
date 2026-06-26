@@ -91,17 +91,17 @@ body {
   flex:1;
   overflow-y:scroll;
   -webkit-overflow-scrolling:touch;
-  padding:8px 0 8px;
   display:flex;
   flex-direction:column;
   background:#000;
 }
 .chat-inner {
-  min-height:calc(100% + 60px);
+  flex:1;
   display:flex;
   flex-direction:column;
   justify-content:flex-end;
   padding:8px 0;
+  padding-top:80px;
 }
 .chat-area::-webkit-scrollbar { display:none; }
 
@@ -732,7 +732,8 @@ function renderSMS() {
     }
     inner.appendChild(row);
   });
-  chat.scrollTop=chat.scrollHeight;
+  // Scroll to bottom
+  requestAnimationFrame(() => { chat.scrollTop = chat.scrollHeight; });
 }
 
 // ── SEND ──
