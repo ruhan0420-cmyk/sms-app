@@ -491,7 +491,7 @@ const PW = '0606';
 let editingMsgId = null;
 let detailKey = null;
 
-let state = {
+const DEFAULT_STATE = {
   phone: '010-●●●●-●●●5',
   messages: [
     { id:1, type:'received', date:'12月18日(木)', time:'午後 12:44', text:'U 1B ㅠ...', faded:true },
@@ -500,6 +500,22 @@ let state = {
   ],
   nextId:10
 };
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem('smsAppState');
+    if (saved) return JSON.parse(saved);
+  } catch(e) {}
+  return JSON.parse(JSON.stringify(DEFAULT_STATE));
+}
+
+function saveState() {
+  try {
+    localStorage.setItem('smsAppState', JSON.stringify(state));
+  } catch(e) {}
+}
+
+let state = loadState();
 
 // ── SCREENS ──
 function showScreen(id) {
@@ -636,7 +652,7 @@ function addMsg() {
   state.messages.push({id,type:'received',date:'',time:'',text:'',faded:false});
   openMsgDetail(id);
 }
-function applyAndShowSMS() { showSMS(); }
+function applyAndShowSMS() { saveState(); showSMS(); }
 
 // ── SMS ──
 function openContact() {
@@ -751,6 +767,7 @@ function sendMsg() {
     text, faded:false
   });
   input.value=''; input.style.height='auto';
+  saveState();
   renderSMS();
   const rows=document.querySelectorAll('.bubble-row');
   const last=rows[rows.length-1];
@@ -765,6 +782,46 @@ document.getElementById('msgInput').addEventListener('keydown',e=>{
 });
 
 if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
+
+// ── BOUNCE SCROLL ──
+(function() {
+  const el = document.getElementById('chatArea');
+  let startY = 0, startScroll = 0, isDragging = false;
+
+  el.addEventListener('touchstart', e => {
+    startY = e.touches[0].clientY;
+    startScroll = el.scrollTop;
+    isDragging = true;
+    el.style.transition = 'none';
+  }, { passive: true });
+
+  el.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    const dy = startY - e.touches[0].clientY;
+    const newScroll = startScroll + dy;
+    const maxScroll = el.scrollHeight - el.clientHeight;
+
+    if (newScroll < 0) {
+      // Over-scroll at top — apply resistance
+      el.scrollTop = 0;
+      el.style.transform = `translateY(${-newScroll * 0.35}px)`;
+    } else if (newScroll > maxScroll) {
+      // Over-scroll at bottom — apply resistance
+      el.scrollTop = maxScroll;
+      el.style.transform = `translateY(${-(newScroll - maxScroll) * 0.35}px)`;
+    } else {
+      el.scrollTop = newScroll;
+      el.style.transform = 'translateY(0)';
+    }
+  }, { passive: true });
+
+  el.addEventListener('touchend', () => {
+    isDragging = false;
+    el.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+    el.style.transform = 'translateY(0)';
+  });
+})();
+
 showSMS();
 </script>
 </body>
