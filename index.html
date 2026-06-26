@@ -89,12 +89,19 @@ body {
 
 .chat-area {
   flex:1;
-  overflow-y:auto;
+  overflow-y:scroll;
   -webkit-overflow-scrolling:touch;
   padding:8px 0 8px;
   display:flex;
   flex-direction:column;
   background:#000;
+}
+.chat-inner {
+  min-height:calc(100% + 1px);
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  padding:8px 0;
 }
 .chat-area::-webkit-scrollbar { display:none; }
 
@@ -197,7 +204,7 @@ body {
   -webkit-backdrop-filter:blur(20px);
   border-top:0.5px solid rgba(255,255,255,0.1);
   padding:8px 12px;
-  padding-bottom:max(calc(var(--safe-bottom)+4px),16px);
+  padding-bottom:max(calc(env(safe-area-inset-bottom) + 8px),24px);
   display:flex;
   align-items:flex-end;
   gap:10px;
@@ -470,7 +477,7 @@ body {
     </div>
     <div class="sms-nav-right"></div>
   </div>
-  <div class="chat-area" id="chatArea"></div>
+  <div class="chat-area" id="chatArea"><div class="chat-inner" id="chatInner"></div></div>
   <div class="input-bar">
     <div class="input-plus">+</div>
     <div class="input-wrap">
@@ -654,7 +661,8 @@ function goToEdit() {
 function renderSMS() {
   document.getElementById('displayPhone').textContent=state.phone;
   const chat=document.getElementById('chatArea');
-  chat.innerHTML='';
+  const inner=document.getElementById('chatInner');
+  inner.innerHTML='';
 
   let lastDate = null;
 
@@ -671,7 +679,7 @@ function renderSMS() {
       // Same date: show type + time only
       div.innerHTML=`<span class="msg-divider-type">${typeLabel}</span><span class="msg-divider-date">${msg.time}</span>`;
     }
-    chat.appendChild(div);
+    inner.appendChild(div);
 
     const row=document.createElement('div');
     row.className=`bubble-row ${msg.type==='sent'?'sent':'received'}${msg.faded?' faded':''}`;
@@ -722,7 +730,7 @@ function renderSMS() {
       b.addEventListener('touchend',()=>b.style.opacity='');
       row.appendChild(b);
     }
-    chat.appendChild(row);
+    inner.appendChild(row);
   });
   chat.scrollTop=chat.scrollHeight;
 }
